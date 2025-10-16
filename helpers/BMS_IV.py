@@ -64,13 +64,13 @@ def implied_vol_BMS(option_type: str, S_hat: float, K: float, r: float, ttm: flo
         
     if opt_method == "golden":
         sigma_hat = golden(objective_func, 
-                       brack=(1e-8, 50.0),  # interval
+                       brack=(1e-6, 10.0),  # interval
                        tol=1e-5,  # tolerance for stopping criterion
                         maxiter=1000,  # maximum number of iterations
                        )
     elif opt_method == "brentq":
         sigma_hat = brentq(objective_func, 
-                           1e-7,  # lower bound
+                           1e-6,  # lower bound
                            10.0,  # upper bound
                            maxiter=1000)
 

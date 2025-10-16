@@ -2,6 +2,86 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 from typing import Optional
+from scipy.optimize import brentq
+
+
+def CRR_tree_option_price_fast(
+    S0: float,
+    K: float,
+    r: float,
+    y: float,
+    ttm: float,
+    sigma: float,
+    N: int,
+    option_type: str = 'C'
+) -> float:
+    """
+    Fast CRR option pricing - only returns price at root, no full tree storage.
+    
+    Returns:
+        float: Option price at t=0
+    """
+    dt = ttm / N
+    u = np.exp(sigma * np.sqrt(dt))
+    d = 1 / u
+    p = (np.exp((r - y) * dt) - d) / (u - d)
+    discount = np.exp(-r * dt)
+    
+    # Only store current and next time step values (not entire tree)
+    option_values = np.zeros(N + 1)
+    
+    # Terminal payoffs
+    for j in range(N + 1):
+        ST = S0 * (u ** (N - j)) * (d ** j)
+        if option_type.upper() == 'C':
+            option_values[j] = max(ST - K, 0)
+        else:
+            option_values[j] = max(K - ST, 0)
+    
+    # Backward induction - overwrite array in place
+    for i in range(N - 1, -1, -1):
+        for j in range(i + 1):
+            option_values[j] = discount * (p * option_values[j] + (1 - p) * option_values[j + 1])
+    
+    return option_values[0]
+
+def implied_vol_crr_fast(
+    S0: float,
+    K: float,
+    r: float,
+    y: float,
+    ttm: float,
+    market_price: float,
+    N: int,
+    option_type: str = 'C'
+) -> float:
+    """Calculate implied volatility using fast CRR pricing."""
+    def objective_func(sigma):
+        return CRR_tree_option_price_fast(S0, K, r, y, ttm, sigma, N, option_type) - market_price
+    
+    try:
+        return brentq(objective_func, 1e-6, 10.0, maxiter=1000)
+    except:
+        return np.nan
+
+
+def Wrapper_implied_vol_crr_fast(row):
+    """Wrapper function that can be imported by child processes. for use in multiprocessing."""
+    return implied_vol_crr_fast(
+        row['stock_exdiv'], 
+        row['strike'], 
+        row['risk_free'], 
+        row['convenience_yield'],
+        row['YTM'], 
+        row['option_price'], 
+        min(max(5 * int(row['DTM']), 1),500),  # Cap N to avoid excessive computation time
+        row['cp_flag']
+    )
+
+
+
+
+
 
 def CRR_tree_option_price(
     S0: float,
@@ -91,14 +171,15 @@ def implied_vol_crr(
     Returns:
         float: Implied volatility or NaN if no root found.
     """
-    def objective(sigma):
+    def objective_func(sigma):
         option_values, _ = CRR_tree_option_price(S0, K, r, y, ttm, sigma, N, option_type)
         return option_values[0, 0] - market_price
 
-    try:
-        return brentq(objective, 1e-6, 10.0)
-    except Exception:
-        return np.nan
+    return brentq(objective_func,
+                           1e-6,  # lower bound
+                           10.0,  # upper bound
+                           maxiter=1000)
+
 
 
 
