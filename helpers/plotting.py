@@ -216,3 +216,72 @@ def Q4_plot(otm_options: pd.DataFrame) -> plt.Figure:
                 fontsize=12, y=1.02)
     
     return fig
+
+
+def Q6_plot(options: pd.DataFrame) -> plt.Figure:
+    
+        # Filter by dates
+        options_jan17 = options[options['date'] == dt.date(2020, 1, 17)]
+        options_mar20 = options[options['date'] == dt.date(2020, 3, 20)]
+
+        fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+
+        # ----------- Jan 17 subplot -----------
+        ax = axes[0]
+        calls_jan = options_jan17[options_jan17['is_call']]
+        puts_jan = options_jan17[~options_jan17['is_call']]
+        ax.scatter(calls_jan['moneyness'], calls_jan['early_exercise_premium'],
+                c='blue', alpha=0.6, s=20, label='Calls')
+        ax.scatter(puts_jan['moneyness'], puts_jan['early_exercise_premium'],
+                c='red', alpha=0.6, s=20, label='Puts')
+        ax.set_xlabel('Moneyness (K/S)')
+        ax.set_ylabel('Early Exercise Premium ($)')
+        ax.set_title('Early Exercise Premium - 2020-01-17')
+        ax.axhline(y=0, color='black', linestyle='--', linewidth=0.5)
+        ax.axvline(x=1, color='black', linestyle='--', linewidth=0.5)
+        ax.legend()
+        ax.grid(True)
+        # Draw horizontal arrow for OTM puts and ITM calls
+        ax.annotate('', xy=(0.7, 7), xytext=(0.98, 7),
+        arrowprops=dict(arrowstyle='-|>', color='green', linewidth=3))
+
+        ax.text(0.85, 7.15, 'OTM puts', ha='center', va='bottom', fontsize=14, color='red')
+        ax.text(0.85, 6.85, 'ITM calls', ha='center', va='top', fontsize=14, color='blue')
+
+        # Draw horizontal arrow for ITM puts and OTM calls
+        ax.annotate('', xy=(1.3, 7), xytext=(1.02, 7),
+        arrowprops=dict(arrowstyle='-|>', color='green', linewidth=3))
+
+        ax.text(1.15, 7.15, 'ITM puts', ha='center', va='bottom', fontsize=14, color='red')
+        ax.text(1.15, 6.85, 'OTM calls', ha='center', va='top', fontsize=14, color='blue')
+
+        # ----------- Mar 20 subplot -----------
+        ax = axes[1]
+        calls_mar = options_mar20[options_mar20['is_call']]
+        puts_mar = options_mar20[~options_mar20['is_call']]
+        ax.scatter(calls_mar['moneyness'], calls_mar['early_exercise_premium'],
+                c='blue', alpha=0.6, s=20, label='Calls')
+        ax.scatter(puts_mar['moneyness'], puts_mar['early_exercise_premium'],
+                c='red', alpha=0.6, s=20, label='Puts')
+        ax.set_xlabel('Moneyness (K/S)')
+        ax.set_ylabel('Early Exercise Premium ($)')
+        ax.set_title('Early Exercise Premium - 2020-03-20')
+        ax.axhline(y=0, color='black', linestyle='--', linewidth=0.5)
+        ax.axvline(x=1, color='black', linestyle='--', linewidth=0.5)
+        ax.legend()
+        ax.grid(True)
+        # Draw horizontal arrow for OTM puts and ITM calls
+        ax.annotate('', xy=(0.6, 3), xytext=(0.98, 3),
+        arrowprops=dict(arrowstyle='-|>', color='green', linewidth=3))
+
+        ax.text(0.8, 3.05, 'OTM puts', ha='center', va='bottom', fontsize=14, color='red')
+        ax.text(0.8, 2.9, 'ITM calls', ha='center', va='top', fontsize=14, color='blue')
+
+        # Draw horizontal arrow for ITM puts and OTM calls
+        ax.annotate('', xy=(1.4, 3), xytext=(1.02, 3),
+        arrowprops=dict(arrowstyle='-|>', color='green', linewidth=3))
+
+        ax.text(1.2, 3.05, 'ITM puts', ha='center', va='bottom', fontsize=14, color='red')
+        ax.text(1.2, 2.9, 'OTM calls', ha='center', va='top', fontsize=14, color='blue')
+
+        return fig

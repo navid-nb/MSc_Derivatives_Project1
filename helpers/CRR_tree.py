@@ -63,7 +63,9 @@ def CRR_tree_option_price_american_fast(
     d_powers = d ** j
 
     # Compute terminal stock prices and option payoffs at maturity
-    ST = S0 * u_powers * d_powers[N] / d_powers
+    # ST = S0 * u_powers * d_powers[N] / d_powers
+    ST = S0 * u_powers * d_powers[::-1]
+
     if option_type.upper() == "C":
         values = np.maximum(ST - K, 0.0)
     elif option_type.upper() == "P":
@@ -74,7 +76,8 @@ def CRR_tree_option_price_american_fast(
     # Backward induction: step back through the tree, checking for early exercise
     for step in range(N - 1, -1, -1):
         # Stock prices at this step using pre-computed powers
-        S_step = S0 * u_powers[:step + 1] * d_powers[step] / d_powers[:step + 1]
+        # S_step = S0 * u_powers[:step + 1] * d_powers[step] / d_powers[:step + 1]
+        S_step = S0 * u_powers[:step + 1] * d_powers[step::-1]
 
         # Calculate continuation and early exercise values
         continuation = discount * (p * values[1:step + 2] + (1.0 - p) * values[:step + 1])
