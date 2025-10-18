@@ -4,7 +4,7 @@ import datetime as dt
 import pandas as pd
 
 def Q3_plot1(otm_options: pd.DataFrame) -> plt.Figure:
-    """Plot implied volatility smiles for OTM options on Jan 17, 2020 and Mar 20, 2020."""
+    
     moneyness_col='moneyness'
     options_jan17 = otm_options[otm_options['date'] == dt.date(2020,1,17)]
     options_mar20 = otm_options[otm_options['date'] == dt.date(2020,3,20)]
@@ -68,7 +68,7 @@ def Q3_plot1(otm_options: pd.DataFrame) -> plt.Figure:
     return fig
 
 def Q3_plot2(otm_options: pd.DataFrame) -> plt.Figure:
-    """Plot implied volatility smiles for OTM options on Jan 17, 2020 and Mar 20, 2020."""
+    
     moneyness_col='moneyness_adjusted'
     options_jan17 = otm_options[otm_options['date'] == dt.date(2020,1,17)]
     options_mar20 = otm_options[otm_options['date'] == dt.date(2020,3,20)]
