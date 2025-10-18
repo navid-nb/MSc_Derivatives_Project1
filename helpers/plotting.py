@@ -161,3 +161,58 @@ def Q3_plot(otm_options: pd.DataFrame) -> plt.Figure:
                 fontsize=12, y=1.02)
     
     return fig
+
+
+def Q4_plot(otm_options: pd.DataFrame) -> plt.Figure:
+    
+    # Filter options by quote date
+    options_jan17 = otm_options[otm_options['date'] == dt.date(2020, 1, 17)]
+    options_mar20 = otm_options[otm_options['date'] == dt.date(2020, 3, 20)]
+
+    # Create figure with two subplots
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+    # Left subplot: January 17, 2020
+    ax = axes[0]
+    jan_puts = options_jan17[options_jan17['cp_flag'] == 'P']
+    jan_calls = options_jan17[options_jan17['cp_flag'] == 'C']
+
+    ax.scatter(jan_puts['moneyness'], 
+            100 * (jan_puts['impl_volatility'] / jan_puts['crr_implied_vol'] - 1),
+            alpha=0.6, s=20, label='Puts', color='red')
+
+    ax.scatter(jan_calls['moneyness'], 
+            100 * (jan_calls['impl_volatility'] / jan_calls['crr_implied_vol'] - 1),
+            alpha=0.6, s=20, label='Calls', color='blue')
+
+    ax.set_xlabel('Moneyness (K / S_t)')
+    ax.set_ylabel('100 × (impl_volatility/crr_implied_vol - 1) %')
+    ax.set_title('Quote Date: 2020-01-17')
+    ax.grid(True)
+    ax.legend()
+    ax.axhline(y=0, color='black', linestyle='--', linewidth=0.8, alpha=0.5)
+
+    # Right subplot: March 20, 2020
+    ax = axes[1]
+    mar_puts = options_mar20[options_mar20['cp_flag'] == 'P']
+    mar_calls = options_mar20[options_mar20['cp_flag'] == 'C']
+
+    ax.scatter(mar_puts['moneyness'], 
+            100 * (mar_puts['impl_volatility'] / mar_puts['crr_implied_vol'] - 1),
+            alpha=0.6, s=20, label='Puts', color='red')
+
+    ax.scatter(mar_calls['moneyness'], 
+            100 * (mar_calls['impl_volatility'] / mar_calls['crr_implied_vol'] - 1),
+            alpha=0.6, s=20, label='Calls', color='blue')
+
+    ax.set_xlabel('Moneyness (K / S_t)')
+    ax.set_ylabel('100 × (impl_volatility/crr_implied_vol - 1) %')
+    ax.set_title('Quote Date: 2020-03-20')
+    ax.grid(True)
+    ax.legend()
+    ax.axhline(y=0, color='black', linestyle='--', linewidth=0.8, alpha=0.5)
+
+    plt.suptitle('Percentage Difference Between Provider and CRR Implied Volatilities for OTM Options', 
+                fontsize=12, y=1.02)
+    
+    return fig
